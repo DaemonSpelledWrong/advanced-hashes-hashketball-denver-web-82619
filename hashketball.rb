@@ -120,10 +120,10 @@ def game_hash
 end
 
 def all_players
-  input = game_hash[:home][:players].reduce({}, :merge)
-  input2 = game_hash[:away][:players].reduce({}, :merge)
-  input3 = [input, input2].reduce({}, :merge)
-  input3
+  home_players = game_hash[:home][:players].reduce({}, :merge)
+  away_players = game_hash[:away][:players].reduce({}, :merge)
+  every_player = [home_players, away_players].reduce({}, :merge)
+  every_player
 end
 
 def player_stats(name)
@@ -155,14 +155,9 @@ def team_colors(team_name)
 end
 
 def player_numbers(team_name)
-  arr = []
   find_team(team_name)[:players].map do |name|
-    name.map do |player, stats|
-      arr << stats[:number]
-    end
-    arr.flatten
-  end
-  arr
+    name.map { |player, stats| stats[:number] }
+  end.flatten
 end
 
 def player_w_biggest_feet
@@ -173,35 +168,29 @@ def big_shoe_rebounds
   player_w_biggest_feet[1][:rebounds]
 end
 
-def most_points_scored # "Ben Gordon"
+def most_points_scored
   result = all_players.max_by { |name, stats| stats[:points] }
   result.flatten
   result[0]
 end
 
-def winning_team # "Brooklyn Nets"
-  arr = []
-  arr2 = []
-  find_team("Brooklyn Nets")[:players].map do |name|
-    arr << name.flatten[1][:points]
-  end
-  find_team("Charlotte Hornets")[:players].map do |name|
-    arr2 << name.flatten[1][:points]
-  end
-  if arr.sum > arr2.sum
-    "Brooklyn Nets"
+def winning_team
+  brooklyn_scores = find_team('Brooklyn Nets')[:players].map { |name| name.flatten[1][:points] }
+  charlotte_scores = find_team('Charlotte Hornets')[:players].map { |name| name.flatten[1][:points] }
+  if brooklyn_scores.sum > charlotte_scores.sum
+    'Brooklyn Nets'
   else
-    "Charlotte Hornets"
+    'Charlotte Hornets'
   end
 end
 
-def player_with_longest_name # "Bismack Biyombo"
+def player_with_longest_name
   result = all_players.max_by { |name, stats| name.length}
   result.flatten
   result[0]
 end
 
-def long_name_steals_a_ton? # true
+def long_name_steals_a_ton?
   result = all_players.max_by { |name, stats| stats[:steals] }
   result.flatten
   player_with_longest_name == result[0]
